@@ -106,7 +106,7 @@ function initLightbox() {
 }
 
 /* =========================================================================
-   GIFT BUTTON — confetti burst + scroll to the reveal
+   GIFT BUTTON — confetti burst + music starts immediately + scroll to reveal
    ========================================================================= */
 function initGiftButton() {
   const btn = document.getElementById("gift-btn");
@@ -114,6 +114,7 @@ function initGiftButton() {
 
   function openGift() {
     burstConfetti();
+    startMusic();
     setTimeout(() => {
       document.getElementById("message-section").scrollIntoView({ behavior: "smooth" });
     }, 350);
@@ -140,7 +141,7 @@ function initRevealOnScroll() {
 }
 
 /* =========================================================================
-   MUSIC PLAYER — YouTube embed, created on click (satisfies autoplay policies)
+   MUSIC PLAYER — starts on gift open, no second click required
    ========================================================================= */
 function getYouTubeId(url) {
   const patterns = [
@@ -155,35 +156,45 @@ function getYouTubeId(url) {
   return null;
 }
 
-function initMusicPlayer() {
+let musicStarted = false;
+
+function startMusic() {
   const btn = document.getElementById("music-btn");
   const label = document.getElementById("music-btn-label");
   const player = document.getElementById("music-player");
   const videoId = getYouTubeId(CONFIG.youtubeUrl);
 
-  let started = false;
+  if (!videoId || CONFIG.youtubeUrl.includes("YOUR_YOUTUBE_LINK_HERE")) {
+    label.textContent = "Add your song link in CONFIG ✏️";
+    return;
+  }
+
+  if (musicStarted) {
+    player.hidden = false;
+    return;
+  }
+
+  const iframe = document.createElement("iframe");
+  iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&playsinline=1`;
+  iframe.title = "Our song";
+  iframe.allow = "autoplay; encrypted-media; picture-in-picture";
+  iframe.allowFullscreen = true;
+  player.appendChild(iframe);
+  player.hidden = false;
+  musicStarted = true;
+  label.textContent = "Now Playing 🎵";
+  btn.classList.add("playing");
+}
+
+function initMusicPlayer() {
+  const btn = document.getElementById("music-btn");
+  const player = document.getElementById("music-player");
 
   btn.addEventListener("click", () => {
-    if (!videoId || CONFIG.youtubeUrl.includes("YOUR_YOUTUBE_LINK_HERE")) {
-      label.textContent = "Add your song link in CONFIG ✏️";
-      return;
-    }
-
-    if (!started) {
-      // Created inside a click handler so autoplay is allowed by the browser.
-      // If autoplay is still blocked, YouTube's own player shows a play button.
-      const iframe = document.createElement("iframe");
-      iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
-      iframe.title = "Our song";
-      iframe.allow = "autoplay; encrypted-media; picture-in-picture";
-      iframe.allowFullscreen = true;
-      player.appendChild(iframe);
-      player.hidden = false;
-      started = true;
-      label.textContent = "Now Playing 🎵";
-      btn.classList.add("playing");
-    } else {
+    if (musicStarted) {
       player.hidden = !player.hidden;
+    } else {
+      startMusic();
     }
   });
 }
