@@ -5,7 +5,7 @@ const CONFIG = {
   motherName: "Mom",
 
   // Paste your own YouTube link (any format works: youtu.be/... or youtube.com/watch?v=...)
-  youtubeUrl: "https://youtu.be/J8V5lTqAXTA?si=u7X3bAGRjkhBD1lJ",
+  youtubeUrl: "https://youtu.be/nZ41BVL9OnU?si=AfM8h-lE-8to1jKX",
 
   photos: [
     { src: "images/mom1.jpg", caption: "Just the two of us ❤️" },
